@@ -1,5 +1,14 @@
 import requests
 
+
+def display_profile(profile_data):
+    print(f"Login: {profile_data['login']}")
+    print(f"Name: {profile_data['name']}")
+    print(f"Public Repos: {profile_data['public_repos']}")
+    print(f"Followers: {profile_data['followers']}")
+    print(f"URL: {profile_data['html_url']}")
+
+
 username = input("Input a Github username:")
 
 try:
@@ -8,22 +17,19 @@ try:
     )
     profile_data = profile_response.json()
     if profile_response.status_code == 200:
-        print(f"Login: {profile_data['login']}")
-        print(f"Name: {profile_data['name']}")
-
-        print(f"Public Repos: {profile_data['public_repos']}")
-        print(f"Followers: {profile_data['followers']}")
-        print(f"URL: {profile_data['html_url']}")
+        display_profile(profile_data)
         repositories_response = requests.get(
             f"https://api.github.com/users/{username}/repos", timeout=10
         )
         repositories = repositories_response.json()
         if repositories_response.status_code == 200:
-            print(repositories_response.status_code)
-            print(type(repositories))
-            print(len(repositories))
+            print("Repositories:")
             for repository in repositories:
-                print(repository["name"])
+                print(f"Name: {repository['name']}")
+                print(f"Language: {repository['language']}")
+                print(f"Stars: {repository['stargazers_count']}")
+                print(f"Forks: {repository['forks_count']}")
+                print("")
         else:
             print(f"Could not fetch repositories. {repositories_response.status_code}")
 
