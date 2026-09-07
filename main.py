@@ -10,9 +10,17 @@ try:
     if profile_response.status_code == 200:
         print(f"Login: {profile_data['login']}")
         print(f"Name: {profile_data['name']}")
+
         print(f"Public Repos: {profile_data['public_repos']}")
         print(f"Followers: {profile_data['followers']}")
         print(f"URL: {profile_data['html_url']}")
+        repositories_response = requests.get(
+            f"https://api.github.com/users/{username}/repos", timeout=10
+        )
+        repositories = repositories_response.json()
+        print(repositories_response.status_code)
+        print(type(repositories))
+        print(len(repositories))
     elif profile_response.status_code == 404:
         print("Github user not found.")
     else:
