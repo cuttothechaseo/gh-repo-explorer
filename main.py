@@ -19,27 +19,67 @@ def display_repositories(repositories):
         print("")
 
 
-username = input("Input a Github username:")
+def search_repositories(repositories, search_term):
+    matches = []
+    search_term = str(search_term or "").strip().lower()
 
-try:
-    profile_response = requests.get(
-        f"https://api.github.com/users/{username}", timeout=10
-    )
-    profile_data = profile_response.json()
-    if profile_response.status_code == 200:
-        display_profile(profile_data)
-        repositories_response = requests.get(
-            f"https://api.github.com/users/{username}/repos", timeout=10
+    for repository in repositories:
+        if search_term in str(repository["name"]).lower():
+            matches.append(repository)
+
+    return matches
+
+
+def filter_repositories_by_language(repositories, language):
+    matches = []
+    requested_language = str(language or "").strip().lower()
+
+    for repository in repositories:
+        repository_language = repository["language"]
+        if (
+            repository_language is not None
+            and repository_language.lower() == requested_language
+        ):
+            matches.append(repository)
+
+    return matches
+
+
+def main():
+    username = input("Input a Github username:")
+
+    try:
+        profile_response = requests.get(
+            f"https://api.github.com/users/{username}", timeout=10
         )
-        repositories = repositories_response.json()
-        if repositories_response.status_code == 200:
-            display_repositories(repositories)
-        else:
-            print(f"Could not fetch repositories. {repositories_response.status_code}")
+        profile_data = profile_response.json()
+        if profile_response.status_code == 200:
+            display_profile(profile_data)
+            repositories_response = requests.get(
+                f"https://api.github.com/users/{username}/repos", timeout=10
+            )
+            repositories = repositories_response.json()
+            if repositories_response.status_code == 200:
+                display_repositories(repositories)
+                search_term = input("Search for a repository:")
+                matching_repositories = search_repositories(repositories, search_term)
+                print(f"Matches found: {len(matching_repositories)}")
+                if len(matching_repositories) > 0:
+                    display_repositories(matching_repositories)
+                else:
+                    print("No matching repositories found.")
+            else:
+                print(
+                    f"Could not fetch repositories. {repositories_response.status_code}"
+                )
 
-    elif profile_response.status_code == 404:
-        print("Github user not found.")
-    else:
-        print(f"Unexpected response status: {profile_response.status_code}")
-except requests.exceptions.RequestException:
-    print("Request failed. Please check your connection and try again.")
+        elif profile_response.status_code == 404:
+            print("Github user not found.")
+        else:
+            print(f"Unexpected response status: {profile_response.status_code}")
+    except requests.exceptions.RequestException:
+        print("Request failed. Please check your connection and try again.")
+
+
+if __name__ == "__main__":
+    main()
