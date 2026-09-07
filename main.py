@@ -9,6 +9,16 @@ def display_profile(profile_data):
     print(f"URL: {profile_data['html_url']}")
 
 
+def display_repositories(repositories):
+    print("Repositories:")
+    for repository in repositories:
+        print(f"Name: {repository['name']}")
+        print(f"Language: {repository['language']}")
+        print(f"Stars: {repository['stargazers_count']}")
+        print(f"Forks: {repository['forks_count']}")
+        print("")
+
+
 username = input("Input a Github username:")
 
 try:
@@ -23,13 +33,7 @@ try:
         )
         repositories = repositories_response.json()
         if repositories_response.status_code == 200:
-            print("Repositories:")
-            for repository in repositories:
-                print(f"Name: {repository['name']}")
-                print(f"Language: {repository['language']}")
-                print(f"Stars: {repository['stargazers_count']}")
-                print(f"Forks: {repository['forks_count']}")
-                print("")
+            display_repositories(repositories)
         else:
             print(f"Could not fetch repositories. {repositories_response.status_code}")
 
